@@ -1,0 +1,48 @@
+import base64
+import hashlib
+from cryptography.fernet import Fernet, InvalidToken
+
+def get_key_from_password(password):
+    """Generates a valid encryption key using SHA-256 hashing of your password."""
+    digest = hashlib.sha256(password.encode()).digest()
+    return base64.urlsafe_b64encode(digest)
+
+
+print("--- Secure Encryption Tool ---")
+print("1. Encrypt a message")
+print("2. Decrypt a message")
+
+choice = input("\nEnter your choice (1 or 2): ").strip()
+
+if choice == '1':
+
+    message = input("Enter message to encrypt: ")
+    password = input("Enter a passkey: ")
+    
+
+    key = get_key_from_password(password)
+    f = Fernet(key)
+    encrypted_data = f.encrypt(message.encode())
+    
+    print(f"\nEncrypted Output:\n{encrypted_data.decode()}")
+
+elif choice == '2':
+
+    token = input("Enter the encrypted text: ")
+    password = input("Enter the passkey: ")
+    
+    try:
+     
+        key = get_key_from_password(password)
+        f = Fernet(key)
+        decrypted_data = f.decrypt(token.encode())
+        
+        print(f"\nDecrypted Message:\n{decrypted_data.decode()}")
+        
+    except InvalidToken:
+        print("\nERROR: Wrong passkey or invalid encrypted text.")
+    except Exception as e:
+        print(f"\nERROR: {e}")
+
+else:
+    print("\nInvalid choice. Please run the program again and select 1 or 2.")
